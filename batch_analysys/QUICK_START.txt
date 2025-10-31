@@ -1,0 +1,255 @@
+================================================================================
+  PINN BATCH ANALYSIS - QUICK START GUIDE
+================================================================================
+
+📁 SETUP
+--------
+1. Put this folder next to balance_pinn.py:
+   SISCOIN/
+   ├── balance_pinn.py
+   └── batch_analysys/
+       ├── run_all_stages.py  ← You are here
+       ├── stage1_test.py
+       ├── stage2_subjects.py
+       └── stage3_full.py
+
+2. Update DATA_FOLDER path in each stage script:
+   DATA_FOLDER = r"G:\human-balance-evaluation-database-1.0.0"
+
+3. Install requirements if not already done:
+   pip install numpy torch pandas scipy wfdb scikit-learn matplotlib
+
+================================================================================
+🚀 RUNNING THE ANALYSIS
+================================================================================
+
+EASIEST WAY (Recommended for first-time users):
+------------------------------------------------
+cd batch_analysys
+python run_all_stages.py
+
+→ This will run all 3 stages with confirmations between each stage.
+
+
+AUTOMATIC MODE (Run everything without stopping):
+--------------------------------------------------
+python run_all_stages.py --auto
+
+⚠️  WARNING: This runs all 1,956 files without asking! (~12-24 hours)
+
+
+INDIVIDUAL STAGES (Manual control):
+------------------------------------
+python stage1_test.py          # Test: 24 files, ~10 min
+python stage2_subjects.py      # Subjects: 163 files, ~2-3 hours
+python stage3_full.py          # Full: 1,956 files, ~10-20 hours
+
+
+OTHER OPTIONS:
+--------------
+python run_all_stages.py --skip-stage1          # Skip test, start at stage 2
+python run_all_stages.py --stage 2              # Start from stage 2
+python run_all_stages.py --stages "1,2"         # Only run stages 1 and 2
+
+================================================================================
+📊 WHAT YOU GET
+================================================================================
+
+STAGE 1 OUTPUT:
+  stage1_test_results/
+  └── test_results.csv         ← 24 trials (2 subjects)
+
+STAGE 2 OUTPUT:
+  stage2_subjects_results/
+  └── subjects_results.csv     ← 163 subjects (ONE per subject)
+                                  ⭐ USE THIS FOR QUICK ANALYSIS
+
+STAGE 3 OUTPUT:
+  stage3_full_results/
+  ├── all_1956_files_results.csv    ← All 1,956 trials
+  ├── subjects_averaged.csv         ← 163 subjects (averaged across trials)
+  └── tasks_averaged.csv            ← 652 rows (subject × task)
+                                      ⭐ USE THESE FOR COMPLETE ANALYSIS
+
+================================================================================
+⏱️ TIME ESTIMATES
+================================================================================
+
+WITH GPU (CUDA):
+  Stage 1:  ~10 minutes
+  Stage 2:  ~2-3 hours
+  Stage 3:  ~10-20 hours
+  TOTAL:    ~12-23 hours
+
+WITH CPU:
+  Stage 1:  ~15 minutes
+  Stage 2:  ~8-12 hours
+  Stage 3:  ~3-5 DAYS
+  TOTAL:    ~4-5 DAYS
+
+💡 TIP: Use GPU if available! Check with: nvidia-smi
+
+================================================================================
+✅ RECOMMENDED WORKFLOW
+================================================================================
+
+DAY 1 (Evening):
+  1. Test: python run_all_stages.py --stages "1"       [10 min]
+  2. Check: Open stage1_test_results/test_results.csv
+  3. If good, start Stage 2 before bed:
+     python stage2_subjects.py                         [2-3 hours]
+
+DAY 2 (Morning):
+  1. Check: Open stage2_subjects_results/subjects_results.csv
+  2. Review plots and statistics
+  3. If satisfied, start Stage 3:
+     python stage3_full.py                             [10-20 hours]
+     (Leave running overnight or over weekend)
+
+DAY 3 (Next day):
+  1. Check: stage3_full_results/ folder
+  2. Use CSV files for thesis analysis!
+
+================================================================================
+🔄 RESUME IF INTERRUPTED
+================================================================================
+
+If Stage 3 stops (power loss, crash, etc.):
+  python stage3_full.py
+
+→ It will ask: "Found existing checkpoint. Resume from it? (y/n)"
+→ Type 'y' and press Enter
+→ It continues from where it stopped!
+
+Checkpoints saved every 50 files, so you lose at most ~50 files of work.
+
+================================================================================
+🆘 TROUBLESHOOTING
+================================================================================
+
+ERROR: "File not found"
+  → Check DATA_FOLDER path in scripts
+
+ERROR: "Out of memory"
+  → Reduce N_TRAIN_POINTS in scripts (try 5000 instead of 8000)
+
+ERROR: "Module not found"
+  → Install: pip install numpy torch pandas scipy wfdb scikit-learn matplotlib
+  → Make sure balance_pinn.py is in parent directory
+
+TOO SLOW?
+  → Check if GPU is being used (should say "cuda" not "cpu")
+  → Reduce EPOCHS in scripts (try 3000 instead of 5000)
+  → Use only Stage 2 (163 files is often enough for thesis)
+
+SOME FILES FAILED?
+  → Check failed_files.csv in output folder
+  → Usually due to corrupted data or missing metadata
+  → Continue with successful files
+
+================================================================================
+📈 USING RESULTS FOR THESIS
+================================================================================
+
+QUICK ANALYSIS:
+  Use: stage2_subjects_results/subjects_results.csv
+  - 163 subjects (one file per subject)
+  - Good for correlations, scatter plots, basic stats
+  - Fast to process and analyze
+
+COMPLETE ANALYSIS:
+  Use: stage3_full_results/subjects_averaged.csv
+  - 163 subjects (averaged across all 12 trials)
+  - Better statistics (averages reduce noise)
+  - More robust parameter estimates
+
+TASK COMPARISON:
+  Use: stage3_full_results/tasks_averaged.csv
+  - Compare 4 different tasks
+  - See how balance parameters change with task
+  - ANOVA analysis
+
+VARIABILITY STUDY:
+  Use: stage3_full_results/all_1956_files_results.csv
+  - All trials (3 repetitions per task)
+  - Study within-subject variability
+  - Test-retest reliability
+
+================================================================================
+📝 COLUMNS IN CSV FILES
+================================================================================
+
+subject_number       Subject ID (1 to 163)
+weight_kg            Subject weight
+height_m             Subject height
+
+stiffness_x          Ankle stiffness X direction (Nm/rad)
+stiffness_y          Ankle stiffness Y direction (Nm/rad)
+damping_x            Ankle damping X direction (Nm·s/rad)
+damping_y            Ankle damping Y direction (Nm·s/rad)
+
+omega_n_x            Natural frequency X (Hz)
+omega_n_y            Natural frequency Y (Hz)
+zeta_x               Damping ratio X (dimensionless)
+zeta_y               Damping ratio Y (dimensionless)
+
+rmse_x               Model error X (meters)
+rmse_y               Model error Y (meters)
+r2_x                 Model fit quality X (0-1, higher is better)
+r2_y                 Model fit quality Y (0-1, higher is better)
+
+task                 Task name (Task1-Task4)
+repetition           Repetition number (1-3)
+
+================================================================================
+🎯 EXAMPLE ANALYSES FOR THESIS
+================================================================================
+
+1. CORRELATION ANALYSIS
+   - Plot stiffness vs weight
+   - Plot damping vs height
+   - Calculate Pearson correlations
+
+2. GROUP COMPARISONS
+   - Compare male vs female
+   - Compare age groups
+   - Compare tasks
+
+3. PARAMETER DISTRIBUTIONS
+   - Histograms of K and C
+   - Normal distribution tests
+   - Outlier detection
+
+4. VARIABILITY ANALYSIS
+   - Within-subject variability
+   - Between-subject variability
+   - Test-retest reliability (ICC)
+
+5. PREDICTIVE MODELING
+   - Can we predict K from weight/height?
+   - Linear regression
+   - Multiple regression
+
+================================================================================
+💡 TIPS
+================================================================================
+
+✓ Start with Stage 1 to test everything works
+✓ Use Stage 2 results for quick thesis drafts
+✓ Run Stage 3 overnight or over weekend
+✓ Save checkpoints are automatic - don't worry about crashes
+✓ Review plots visually to catch any obvious errors
+✓ Check R² values (should be > 0.8 for good fits)
+✓ GPU is 5-10x faster than CPU
+✓ You can stop between stages to review results
+
+================================================================================
+🎓 READY TO START?
+================================================================================
+
+cd batch_analysys
+python run_all_stages.py
+
+Good luck with your thesis! 🚀
+
+================================================================================
