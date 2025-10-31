@@ -1,0 +1,24 @@
+# Requirements for Balance PINN
+# Python 3.8+
+
+# Core scientific computing
+numpy>=1.21.0
+torch>=2.0.0
+pandas>=1.3.0
+
+# Signal processing and data loading
+scipy>=1.7.0
+wfdb>=4.0.0
+
+# Machine learning and metrics
+scikit-learn>=1.0.0
+
+# Visualization
+matplotlib>=3.4.0
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-cov>=3.0.0
+black>=22.0.0
+flake8>=4.0.0
+mypy>=0.950
