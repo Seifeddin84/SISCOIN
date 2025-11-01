@@ -278,7 +278,7 @@ if r2_x_data_only > 0.8 and r2_x_final > 0.8:
     print("\n📋 ACTION: Use physics weight ≤ 0.0001 in all training")
     print("   The physics loss is too strong relative to data loss.")
 
-elif r2_x_data_only > 0.8 but r2_x_final < 0.7:
+elif r2_x_data_only > 0.8 and r2_x_final < 0.7:
     print("⚠️  Network CAN fit data, but physics is interfering")
     print("\n📋 ACTION: Physics model may be incompatible with data")
     print("   Options:")
